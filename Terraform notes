@@ -1,1 +1,3 @@
+A data source in terraform is use to retrieve information from existing infrastructure or external information where data already exists so you can use this information in your configuration.
+it is use when resource already exists and we just need to use that resource like VPC, or the resource is dynamic like amid, or if we want to read from other terraform states or cloud provider etc.
 
