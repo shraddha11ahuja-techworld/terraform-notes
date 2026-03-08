@@ -45,3 +45,24 @@ In Terraform, lists and maps are collection data types used to store multiple va
 eg are in vs code.
 A list of objects is a list where each element is a structured object containing multiple attributes.Used when each item has multiple properties.
 A map of objects means each key contains an object with multiple attributes.
+for_each is a Terraform meta-argument used to create multiple instances of a resource or module based on a collection such as a map or set. It allows Terraform to iterate over each element and create uniquely identifiable resources using each.key and each.value. It is commonly used when resources have unique configurations, such as creating multiple EC2 instances, IAM users, or subnets.
+for_each works with map or set. it does not work with list(object) so if it is list first convert to map as for_each requires input in key->value.
+for_each cannot be used inside locals it only works in: resource, module, dynamic block          
+          servers = {
+            web = {
+              instance_type = "t2.micro"
+              ami           = "ami-123"
+            }
+          
+            app = {
+              instance_type = "t2.small"
+              ami           = "ami-456"
+            }
+          }  
+          resource "aws_instance" "servers" {
+          
+            for_each = var.servers
+          
+            ami           = each.value.ami
+            instance_type = each.value.instance_type
+          }
