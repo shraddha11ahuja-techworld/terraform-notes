@@ -1,3 +1,47 @@
-A data source in terraform is use to retrieve information from existing infrastructure or external information where data already exists so you can use this information in your configuration.
-it is use when resource already exists and we just need to use that resource like VPC, or the resource is dynamic like amid, or if we want to read from other terraform states or cloud provider etc.
-
+A data source in Terraform is used to fetch information about existing infrastructure that is not managed by the current Terraform configuration so it can be referenced in Terraform configuration without creating or managing that resource.It allows Terraform to read attributes such as AMI IDs, VPC details, or subnet information and use them while creating new resources. Unlike resources, data sources do not create or manage infrastructure; they only retrieve information.
+          data "aws_ami" "latest_amazon_linux" {
+            most_recent = true
+          
+            owners = ["amazon"]
+          
+            filter {
+              name   = "name"
+              values = ["amzn2-ami-hvm-*"]
+            }
+          }
+          
+          resource "aws_instance" "web" {
+            ami           = data.aws_ami.latest_amazon_linux.id
+            instance_type = "t2.micro"
+          }
+Locals in Terraform are used to define reusable values or expressions within a configuration. They help avoid repeating the same values multiple times and improve code readability and maintainability. Locals are evaluated within the module and can be referenced using the local keyword.
+        locals {
+          project       = "08-input-vars-locals-outputs"
+          project_owner = "terraform-course"
+          cost_center   = "1234"
+          managed_by    = "Terraform"
+        }
+        locals {
+          common_tags = {
+            project       = local.project
+            project_owner = local.project_owner
+            cost_center   = local.cost_center
+            managed_by    = local.managed_by
+          }
+        }
+      resource "aws_instance" "compute" {
+      ami           = data.aws_ami.ubuntu.id
+      instance_type = var.ec2_instance_type
+    
+      root_block_device {
+        delete_on_termination = true
+        volume_size           = var.ec2_volume_config.size
+        volume_type           = var.ec2_volume_config.type
+      }
+    
+      tags = merge(local.common_tags, var.additional_tags)
+    }
+In Terraform, lists and maps are collection data types used to store multiple values. A list is an ordered sequence of elements of the same type, while a map stores key-value pairs.
+eg are in vs code.
+A list of objects is a list where each element is a structured object containing multiple attributes.Used when each item has multiple properties.
+A map of objects means each key contains an object with multiple attributes.
