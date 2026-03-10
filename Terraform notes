@@ -66,3 +66,40 @@ for_each cannot be used inside locals it only works in: resource, module, dynami
             ami           = each.value.ami
             instance_type = each.value.instance_type
           }
+Converting list to map : 
+                    variable "users" {
+                      type = list(object({
+                        username = string
+                        role     = string
+                      }))
+                    }
+
+                    locals {
+                      users_map = {
+                        for user_info in var.users : user_info.username => user_info.role
+                      }
+                    }
+Now create a local users_map, which transforms the var.users list into a map where the username property becomes the key in the map, and the role property becomes the value. What happens when we have more than one entry in the list containing the same username?
+Having a duplicated key will throw an error. Use the ellipsis operator at the end of user_info.role to group together all the roles for a single username under the same map key.
+                    locals {
+                      users_map = {
+                        for user_info in var.users : user_info.username => user_info.role...
+                      }
+                    }
+Now create a new local which transforms our local.users_map into a new map with the following structure: <key> => { roles = <roles list> }
+          locals {
+            users_map2 = {
+              for username, roles in local.users_map : username => {
+                roles = roles
+              }
+            }
+          }
+create a local that transforms the local.users_map map into a list containing only the username of each map entry
+          locals = {
+            usernames_from_map = [for username, roles in local.users_map : username]
+            # We can also use usernames_from_map = keys(local.users_map) instead of manually creating the list!
+          }
+          
+          output "usernames_from_map" {
+            value = local.usernames_from_map
+          }
