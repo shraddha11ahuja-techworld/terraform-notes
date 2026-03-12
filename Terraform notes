@@ -103,3 +103,5 @@ create a local that transforms the local.users_map map into a list containing on
           output "usernames_from_map" {
             value = local.usernames_from_map
           }
+count is use to define a number of instance of a specific resource terraform should create. it can be used with modules and resources
+
